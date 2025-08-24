@@ -1,3 +1,9 @@
+/* Author: Arunkumar503 */
+:root {
+    --primary-color: #2563eb;
+    /* ...rest of your CSS... */
+}
+
 // Initialize AOS (Animate On Scroll)
 AOS.init({
     duration: 1000,
