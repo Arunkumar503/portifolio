@@ -1,3 +1,3 @@
 # portfolio
 My portfolio
-https://arunarya.netlify.app/
+https://arunkumar05.netlify.app/
