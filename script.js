@@ -1,223 +1,157 @@
-/* Author: Arunkumar503 */
-:root {
-    --primary-color: #2563eb;
-    /* ...rest of your CSS... */
-}
+document.addEventListener("DOMContentLoaded", () => {
 
-// Initialize AOS (Animate On Scroll)
-AOS.init({
-    duration: 1000,
-    once: true,
-    offset: 100
-});
-
-// Navbar scroll behavior
-const navbar = document.getElementById('mainNav');
-const navLinks = document.querySelectorAll('.nav-link');
-const sections = document.querySelectorAll('section');
-
-window.addEventListener('scroll', () => {
-    // Add/remove background color based on scroll position
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
+    /* ================= AOS ================= */
+    if (typeof AOS !== "undefined") {
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
     }
 
-    // Update active nav link based on scroll position
-    let current = '';
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (scrollY >= sectionTop - 60) {
-            current = section.getAttribute('id');
-        }
-    });
+    /* ================= NAVBAR ================= */
+    const navbar = document.getElementById("mainNav");
+    const navLinks = document.querySelectorAll(".nav-link");
+    const sections = document.querySelectorAll("section");
 
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').slice(1) === current) {
-            link.classList.add('active');
-        }
-    });
-});
+    if (navbar) {
+        window.addEventListener("scroll", () => {
+            navbar.classList.toggle("scrolled", window.scrollY > 50);
 
-// Smooth scrolling for navigation links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+            let current = "";
+            sections.forEach(section => {
+                if (window.scrollY >= section.offsetTop - 60) {
+                    current = section.id;
+                }
             });
+
+            navLinks.forEach(link => {
+                link.classList.toggle(
+                    "active",
+                    link.getAttribute("href")?.slice(1) === current
+                );
+            });
+        });
+    }
+
+    /* ================= SMOOTH SCROLL ================= */
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", e => {
+            e.preventDefault();
+            const target = document.querySelector(anchor.getAttribute("href"));
+            target?.scrollIntoView({ behavior: "smooth" });
+
+            const navbarCollapse = document.getElementById("navbarNav");
+            navbarCollapse?.classList.remove("show");
+        });
+    });
+
+    /* ================= TYPED JS ================= */
+    if (typeof Typed !== "undefined" && document.querySelector(".typed-text")) {
+        new Typed(".typed-text", {
+            strings: ["Full Stack Developer", "Problem Solver", "Tech Enthusiast"],
+            typeSpeed: 50,
+            backSpeed: 30,
+            backDelay: 2000,
+            loop: true
+        });
+    }
+
+    /* ================= SCROLL TO TOP ================= */
+    const scrollToTopBtn = document.getElementById("scrollToTop");
+
+    if (scrollToTopBtn) {
+        window.addEventListener("scroll", () => {
+            scrollToTopBtn.classList.toggle("visible", window.scrollY > 300);
+        });
+
+        scrollToTopBtn.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }
+
+    /* ================= DARK MODE ================= */
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (darkModeToggle) {
+        if (
+            localStorage.getItem("theme") === "dark" ||
+            (!localStorage.getItem("theme") && prefersDark)
+        ) {
+            document.documentElement.setAttribute("data-theme", "dark");
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
         }
-        // Close mobile menu if open
-        const navbarCollapse = document.getElementById('navbarNav');
-        if (navbarCollapse.classList.contains('show')) {
-            navbarCollapse.classList.remove('show');
+
+        darkModeToggle.addEventListener("click", () => {
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            document.documentElement.setAttribute("data-theme", isDark ? "light" : "dark");
+            darkModeToggle.innerHTML = isDark
+                ? '<i class="fas fa-moon"></i>'
+                : '<i class="fas fa-sun"></i>';
+            localStorage.setItem("theme", isDark ? "light" : "dark");
+        });
+    }
+
+    /* ================= CONTACT FORM ================= */
+    const contactForm = document.querySelector(".contact-form");
+
+    contactForm?.addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        if (!submitBtn) return;
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+        try {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            showNotification("Message sent successfully!", "success");
+            contactForm.reset();
+        } catch {
+            showNotification("Failed to send message.", "error");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = "Send Message";
         }
     });
-});
 
-// Typing animation for the home section
-const typed = new Typed('.typed-text', {
-    strings: ['Full Stack Developer', 'Problem Solver', 'Tech Enthusiast'],
-    typeSpeed: 50,
-    backSpeed: 30,
-    backDelay: 2000,
-    loop: true
-});
-
-// Scroll to top button
-const scrollToTopBtn = document.getElementById('scrollToTop');
-
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        scrollToTopBtn.classList.add('visible');
-    } else {
-        scrollToTopBtn.classList.remove('visible');
-    }
-});
-
-scrollToTopBtn.addEventListener('click', () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+    /* ================= PROJECT IMAGES ================= */
+    document.querySelectorAll(".project-img img").forEach(img => {
+        img.addEventListener("load", () => img.classList.add("loaded"));
     });
+
+    /* ================= EXPERIENCE CARDS ================= */
+    document.querySelectorAll(".experience-card").forEach(card => {
+        card.addEventListener("mousemove", e => {
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+            card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+            card.classList.add("active");
+        });
+
+        card.addEventListener("mouseleave", () => {
+            card.classList.remove("active");
+        });
+    });
+
 });
 
-// Dark mode toggle
-const darkModeToggle = document.getElementById('darkModeToggle');
-const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-
-// Check for saved dark mode preference
-if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && prefersDarkScheme.matches)) {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-}
-
-darkModeToggle.addEventListener('click', () => {
-    let theme = 'light';
-    if (document.documentElement.getAttribute('data-theme') !== 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        theme = 'dark';
-        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-        darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-    }
-    localStorage.setItem('theme', theme);
-});
-
-// Form submission handling
-const contactForm = document.querySelector('.contact-form');
-
-contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = new FormData(contactForm);
-    const submitBtn = contactForm.querySelector('button[type="submit"]');
-    
-    // Disable submit button and show loading state
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-    
-    try {
-        // Simulate form submission (replace with actual form submission logic)
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Show success message
-        showNotification('Message sent successfully!', 'success');
-        contactForm.reset();
-    } catch (error) {
-        // Show error message
-        showNotification('Failed to send message. Please try again.', 'error');
-    } finally {
-        // Reset submit button
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Send Message';
-    }
-});
-
-// Notification system
-function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
+/* ================= NOTIFICATION ================= */
+function showNotification(message, type = "success") {
+    const notification = document.createElement("div");
     notification.className = `notification ${type}`;
     notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <i class="fas ${type === "success" ? "fa-check-circle" : "fa-exclamation-circle"}"></i>
         <span>${message}</span>
     `;
-    
+
     document.body.appendChild(notification);
-    
-    // Trigger animation
-    setTimeout(() => notification.classList.add('show'), 100);
-    
-    // Remove notification after 3 seconds
+    setTimeout(() => notification.classList.add("show"), 100);
+
     setTimeout(() => {
-        notification.classList.remove('show');
+        notification.classList.remove("show");
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
-
-// Add loading animation for project images
-const projectImages = document.querySelectorAll('.project-img img');
-
-projectImages.forEach(img => {
-    img.addEventListener('load', function() {
-        this.classList.add('loaded');
-    });
-});
-
-// Initialize tooltips for skill items
-const skillItems = document.querySelectorAll('.skill-item');
-
-skillItems.forEach(item => {
-    const tooltip = item.getAttribute('data-tooltip');
-    if (tooltip) {
-        item.addEventListener('mouseenter', (e) => {
-            const tooltipEl = document.createElement('div');
-            tooltipEl.className = 'tooltip';
-            tooltipEl.textContent = tooltip;
-            
-            const rect = item.getBoundingClientRect();
-            tooltipEl.style.top = `${rect.top - 30}px`;
-            tooltipEl.style.left = `${rect.left + (rect.width / 2)}px`;
-            
-            document.body.appendChild(tooltipEl);
-            
-            setTimeout(() => tooltipEl.classList.add('show'), 50);
-        });
-        
-        item.addEventListener('mouseleave', () => {
-            const tooltip = document.querySelector('.tooltip');
-            if (tooltip) {
-                tooltip.classList.remove('show');
-                setTimeout(() => tooltip.remove(), 200);
-            }
-        });
-    }
-});
-
-// Experience cards mouse move effect
-document.addEventListener('DOMContentLoaded', function() {
-    const cards = document.querySelectorAll('.experience-card');
-    
-    cards.forEach(card => {
-        card.addEventListener('mousemove', e => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            card.style.setProperty('--mouse-x', `${x}px`);
-            card.style.setProperty('--mouse-y', `${y}px`);
-            card.classList.add('active');
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.classList.remove('active');
-        });
-    });
-}); 
